@@ -46,8 +46,7 @@ func NewTask(name string, trigger *Trigger, job Job) *Task {
 	t.job = job
 	
 	t.counter = 0
-	t.pause = false
-	t.stop = true
+	t.stop = false
 	
 	t.next = time.Now().Local()
 	
@@ -84,24 +83,24 @@ func (t *Task) run() {
 }
 
 func (t *Task) Start() {
-	t.pause = false
+	t.stop = false
 }
 
-
-func (t *Task) Pause() {
-	t.pause = true
+func (t *Task) Stop() {
+	t.stop = true
 }
 
 func (t *Task) Match() bool {
-	now := time.Now().Local()
-	
-	if t.pause {
+
+	if t.stop {
 		return false
 	}
+
+	now := time.Now().Local()
 	
 	trigger := t.GetTrigger()
-	if t.next.Before(now) { 
-		if t.counter < trigger.repeatCount {
+	if t.next.Before(now) {
+		if trigger.repeatCount == 0 || t.counter < trigger.repeatCount {
 			t.next = now.Add(time.Second * trigger.repeatInterval)
 			t.counter ++;
 			return true

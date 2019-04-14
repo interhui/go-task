@@ -35,7 +35,7 @@ func (c *TaskContainer) AddTask(name string, trigger *Trigger, job Job) {
 }
 
 func (c *TaskContainer) RemoveTask(name string) {
-	
+
 }
 
 func (c *TaskContainer) GetTask(name string) *Task {
@@ -51,28 +51,24 @@ func (c *TaskContainer) GetTasks() []*Task {
 	return c.tasks
 }
 
-func (c *TaskContainer) StartTask(taskName string) {
-	
-}
-
 func (c *TaskContainer) Start() {
 
 	log.Println("Start Container : " + c.GetName())
 	
 	c.running = true
-	
+
 	go func() {
 		for {
 			select {
 			case <-time.After(time.Second * 1):
-				for _, task := range(c.tasks) {
+				for _, task := range (c.tasks) {
 					go task.run()
 				}
 				continue
 			case <-c.stop:
 				log.Println("Stop Container : " + c.GetName())
 				return
-			case task := <- c.add:
+			case task := <-c.add:
 				log.Println("Add New Task : " + task.GetName())
 				go task.run()
 			}
@@ -81,19 +77,37 @@ func (c *TaskContainer) Start() {
 	
 }
 
-func (c *TaskContainer) PauseTask(taskName string) {
-	
+func (c *TaskContainer) ResumeAllTask() {
+	for _, task := range(c.tasks) {
+		task.Start()
+	}
 }
 
-func (c *TaskContainer) Pause() {
-	
+func (c *TaskContainer) ResumeTask(taskName string) {
+	for _, task := range(c.tasks) {
+		if taskName == task.name {
+			task.Start()
+			break
+		}
+	}
 }
 
 func (c *TaskContainer) StopTask(taskName string) {
-	
+	for _, task := range(c.tasks) {
+		if taskName == task.name {
+			task.Stop()
+			break
+		}
+	}
 }
 
-func (c *TaskContainer) Stop() {
+func (c *TaskContainer) StopAllTask() {
+	for _, task := range(c.tasks) {
+		task.Stop()
+	}
+}
+
+func (c *TaskContainer) StopContainer() {
 	c.running = false
 	c.stop <- true
 }

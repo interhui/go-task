@@ -53,12 +53,12 @@ func main() {
     c.Start()
     
     time.Sleep(time.Second * 11) // pause container
-    fmt.Println("---------Pause All---------")
-    c.Pause()
+    fmt.Println("---------Stop All Task---------")
+    c.StopAllTask()
     
     time.Sleep(time.Second * 10) // restart container
-    fmt.Println("--------Restart All--------")
-    c.Start()
+    fmt.Println("--------Resume All Task--------")
+    c.ResumeAllTask()
     
     time.Sleep(time.Second * 11) // stop task
     fmt.Println("--------Stop Task A--------")
@@ -66,15 +66,15 @@ func main() {
     
     time.Sleep(time.Second * 10) // restart task
     fmt.Println("------Start Task A--------")
-    c.StartTask("TaskA")
+    c.ResumeTask("TaskA")
     
     time.Sleep(time.Second * 11) // remove task
-    fmt.Println("---------Remove A---------")
+    fmt.Println("-----Remove Task A---------")
     c.RemoveTask("TaskA")
     
     time.Sleep(time.Second * 10) // stop all
-    fmt.Println("---------Stop All---------")
-    c.Stop()
+    fmt.Println("---------Stop Container---------")
+    c.StopContainer()
 	
 	select {
 	case <-time.After(time.Second * 10):
