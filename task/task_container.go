@@ -26,21 +26,39 @@ func (c *TaskContainer) GetName() string {
 	return c.name
 }
 
-func (c *TaskContainer) AddTask(name string, trigger *Trigger, job Job) {
-	task := NewTask(name, trigger, job)
+func (c *TaskContainer) AddTask(taskName string, trigger *Trigger, job Job) bool {
+	for _, task := range(c.tasks) {
+		if task.GetName() == taskName {
+			return false
+		}
+	}
+
+	task := NewTask(taskName, trigger, job)
 	c.tasks = append(c.tasks, task)
 	if c.add != nil && c.running == true {
 		c.add <- task
 	}
+
+	return true
 }
 
-func (c *TaskContainer) RemoveTask(name string) {
+func (c *TaskContainer) RemoveTask(taskName string) bool {
 
+	for i := 0; i < len(c.tasks); {
+		task := c.tasks[i]
+		if task.name ==  taskName {
+			task.Stop()
+			c.tasks = append(c.tasks[:i], c.tasks[i+1:]...)
+			return true
+		}
+	}
+
+	return false
 }
 
-func (c *TaskContainer) GetTask(name string) *Task {
+func (c *TaskContainer) GetTask(taskName string) *Task {
 	for _, task := range(c.tasks) {
-		if task.GetName() == name {
+		if task.GetName() == taskName {
 			return task
 		}
 	}
